@@ -1,0 +1,66 @@
+package com.javarush.task.task27.task2712.kitchen;
+
+import com.javarush.task.task27.task2712.ConsoleHelper;
+import com.javarush.task.task27.task2712.Tablet;
+import com.javarush.task.task27.task2712.statistic.StatisticManager;
+import com.javarush.task.task27.task2712.statistic.event.CookedOrderEventDataRow;
+
+import java.io.IOException;
+import java.util.List;
+
+//список выбранных блюд + список всех блюд
+public class Order {
+
+    //планшет инициализируется в конструкторе
+    private final Tablet tablet;
+    protected List<Dish> dishes;
+
+    /*
+    б) в классе Order создай protected метод initDishes(), в котором инициализируй dishes. Вызови этот метод в конструкторе
+     */
+
+    public Order (Tablet tablet) throws IOException {
+        this.tablet = tablet;
+        initDishes();
+    }
+
+    public Tablet getTablet() {
+        return tablet;
+    }
+
+
+    public List<Dish> getDishes() {
+        return dishes;
+    }
+
+
+
+    //если нет блюд в заказе - возвращаем пустую строку
+    //иначе выводим на экран
+    @Override
+    public String toString() {
+        if (dishes == null || dishes.isEmpty()) {
+            return "";
+        }
+        return "Your order: " + dishes + " of " + tablet + ", cooking time " + getTotalCookingTime() + "min";
+    }
+
+    //считает суммарное время приготовления всех блюд в заказе.
+    public int getTotalCookingTime() {
+        int result = 0;
+        for (Dish dish : dishes) {
+            result += dish.getDuration();
+        }
+        return result;
+    }
+
+   //определяет, есть ли какие либо блюда в заказе.
+    public boolean isEmpty() {
+        return dishes.isEmpty();
+    }
+
+    protected void initDishes() throws IOException {
+        dishes = ConsoleHelper.getAllDishesForOrder();
+    }
+
+}
