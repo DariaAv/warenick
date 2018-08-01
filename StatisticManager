@@ -1,0 +1,126 @@
+package com.javarush.task.task27.task2712.statistic;
+
+import com.javarush.task.task27.task2712.kitchen.Cook;
+import com.javarush.task.task27.task2712.statistic.event.CookedOrderEventDataRow;
+import com.javarush.task.task27.task2712.statistic.event.EventDataRow;
+import com.javarush.task.task27.task2712.statistic.event.EventType;
+import com.javarush.task.task27.task2712.statistic.event.VideoSelectedEventDataRow;
+
+import java.util.*;
+
+//хранилище статистики - SINGLETON
+public class StatisticManager {
+    private static StatisticManager instance;
+    private StatisticStorage statisticStorage = new StatisticStorage();
+
+
+    private StatisticManager() {
+    }
+
+    public static StatisticManager getInstance() {
+        if (instance ==null){
+                instance = new StatisticManager();
+        }
+        return instance;
+    }
+
+    public void register(EventDataRow data){
+        if (data == null) return;
+        statisticStorage.put(data);
+    }
+
+
+
+    public Map<Date, Double> calculateProfit(){
+
+        Map<Date, Double> result = new TreeMap<>( new Comparator<Date>() {
+            @Override
+            public int compare(Date o1, Date o2) {
+                return o2.compareTo( o1 );
+            }
+        } );
+
+        //Получаем копию из хранилища статистики
+        List<EventDataRow> videoList = statisticStorage.getStorage().get( EventType.SELECTED_VIDEOS );
+
+        //Вносим данные из списка в HashMap по датам, результаты суммируем
+        for (EventDataRow event : videoList){
+            Date date = event.getDate();
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+            calendar.setTime(date);
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+
+            double currentAmount = ((VideoSelectedEventDataRow) event).getAmount() / 100.00;
+            if (result.containsKey(calendar.getTime())) {
+                currentAmount += result.get(calendar.getTime());
+            }
+            result.put(calendar.getTime(), currentAmount);
+        }
+        //возвращаем полученную карту
+        return result;
+    }
+
+    public Map<Date, TreeMap<String, Integer>> calculateTimeOfWork() {
+        Map<Date, TreeMap<String, Integer>> result = new TreeMap<>(new Comparator<Date>() {
+            @Override
+            public int compare(Date o1, Date o2) {
+                return o2.compareTo(o1);
+            }
+        });
+        List<EventDataRow> dataRowList = statisticStorage.getStorage().get(EventType.COOKED_ORDER);
+        for (EventDataRow e : dataRowList) {
+
+            Date currentDate = e.getDate();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(currentDate);
+            GregorianCalendar gc = new GregorianCalendar(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+            Date date = gc.getTime();
+
+
+            CookedOrderEventDataRow cookedOrderEventDataRow = (CookedOrderEventDataRow) e;
+            String cookName = cookedOrderEventDataRow.getCookName();
+
+            int cookingTime = (int) Math.ceil(e.getTime());
+
+            if (!result.containsKey(date)) {
+                TreeMap<String, Integer> cooksAndTimes = new TreeMap<>();
+                cooksAndTimes.put(cookName, cookingTime);
+                result.put(date, cooksAndTimes);
+            }
+            else {
+                TreeMap<String, Integer> cooksAndTimes = result.get(date);
+                if (!cooksAndTimes.containsKey(cookName)) {
+                    cooksAndTimes.put(cookName, cookingTime);
+                }
+                else {
+                    cooksAndTimes.put(cookName, cooksAndTimes.get(cookName) + cookingTime);
+                }
+            }
+        }
+        return result;
+    }
+
+
+    private class StatisticStorage{
+        Map<EventType, List<EventDataRow>> storage = new HashMap<>();
+
+        public StatisticStorage() {
+            for (EventType eventType: EventType.values()){
+                storage.put(eventType, new ArrayList<EventDataRow>());
+            }
+        }
+
+        private void put(EventDataRow data){
+            storage.get(data.getType()).add(data);
+
+        }
+        private Map<EventType, List<EventDataRow>> getStorage() {
+            return storage;
+        }
+
+    }
+}
+
