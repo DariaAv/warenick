@@ -1,0 +1,52 @@
+package com.javarush.task.task27.task2712.ad;
+
+//SINGLTON - который будет предоставлять информацию из AdvertisementStorage в нужном нам виде
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class StatisticAdvertisementManager {
+    private static StatisticAdvertisementManager instance;
+    private AdvertisementStorage advertisementStorage;
+
+    private StatisticAdvertisementManager () {
+        advertisementStorage = AdvertisementStorage.getInstance();
+    }
+
+    public static StatisticAdvertisementManager getInstance() {
+        if (instance == null) {
+            instance = new StatisticAdvertisementManager();
+        }
+        return instance;
+    }
+
+    /*
+    3. В StatisticAdvertisementManager создай два (или один) метода (придумать самостоятельно), которые из хранилища AdvertisementStorage достанут все необходимые данные -
+    соответственно список активных и неактивных рекламных роликов.
+Активным роликом считается тот, у которого есть минимум один доступный показ.
+Неактивным роликом считается тот, у которого количество показов равно 0.
+     */
+    public List<Advertisement> getListOfActiveAD () {
+        List<Advertisement> list = advertisementStorage.list();
+        List<Advertisement> result = new ArrayList<>(  );
+
+        for (Advertisement ad : list) {
+            if (ad.getHits() >= 1) {
+                result.add( ad );
+            }
+        }
+        return result;
+    }
+
+    public List<Advertisement> getListOfPassAD() {
+        List<Advertisement> list = advertisementStorage.list();
+        List<Advertisement> result = new ArrayList<>(  );
+
+        for (Advertisement ad : list) {
+            if (ad.getHits() == 0) {
+                result.add( ad );
+            }
+        }
+        return result;
+    }
+}
