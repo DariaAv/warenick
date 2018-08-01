@@ -1,0 +1,13 @@
+package com.javarush.task.task27.task2712.statistic.event;
+
+import java.util.Date;
+
+//интерфейсом-маркером, т.к. не содержит методов, и по нему мы определяем, является ли переданный объект событием или нет.
+public interface EventDataRow {
+    EventType getType();
+//Date getDate(), реализация которого вернет дату создания записи int getTime(), реализация которого вернет время - продолжительность
+//вернет дату создания записи int getTime()
+    Date getDate();
+    //int getTime(), реализация которого вернет время - продолжительность
+    int getTime();
+}
