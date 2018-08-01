@@ -1,0 +1,43 @@
+package com.javarush.task.task27.task2712;
+
+import com.javarush.task.task27.task2712.kitchen.Dish;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ConsoleHelper {
+
+    private static BufferedReader bufferedReader = new BufferedReader( new InputStreamReader( System.in ) );
+
+    //выводим сообщение в консоль
+    public static void writeMessage(String message) {
+        System.out.println(message);
+    }
+    //читаем строку с консоли
+    public static String readString() throws IOException {
+        return bufferedReader.readLine();
+    }
+    //просит пользователя выбрать блюдо и отправляет его в результате
+    public static List<Dish> getAllDishesForOrder() throws IOException {
+        writeMessage(Dish.allDishesToString());
+        writeMessage( "Выберете блюдо" );
+        List<Dish> chosenDish = new ArrayList<>(  );
+        while (true) {
+            String result = readString();
+            if (result.equalsIgnoreCase( "exit" )) {
+                break;
+            }
+            try {
+                chosenDish.add( Dish.valueOf( result ) );
+            }
+            catch (IllegalArgumentException e) {
+                writeMessage( "Данного блюда нет" );
+            }
+        }
+        return chosenDish;
+    }
+
+}
