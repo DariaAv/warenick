@@ -1,0 +1,38 @@
+package com.javarush.task.task27.task2712;
+
+/*этот класс должен:
+* Хранить список всех планшетов
+* Используя Math.random выбирать случайный планшет.
+* Генерировать случайный заказ каждые ORDER_CREATING_INTERVAL миллисекунд для планшета из п.2.2. (не печатай стек-трейс)
+*/
+
+import java.util.List;
+
+public class RandomOrderGeneratorTask implements Runnable {
+
+    List<Tablet> tablets;
+    private int interval;
+
+    public RandomOrderGeneratorTask(List<Tablet> tablets, int interval) {
+        this.tablets = tablets;
+        this.interval = interval;
+    }
+
+    //генерируем случайный заказ
+    @Override
+    public void run() {
+        if (tablets.size() > 0) {
+            while (!Thread.currentThread().isInterrupted()) {
+                Tablet randomTablet = tablets.get( (int) (Math.random() * tablets.size() -1 ) );
+                randomTablet.createTestOrder();
+                try {
+                    Thread.sleep( interval );
+                }
+                catch (InterruptedException e) {
+                    break;
+                }
+            }
+        }
+
+    }
+}
