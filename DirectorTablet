@@ -1,0 +1,75 @@
+package com.javarush.task.task27.task2712;
+
+import com.javarush.task.task27.task2712.ad.Advertisement;
+import com.javarush.task.task27.task2712.ad.StatisticAdvertisementManager;
+import com.javarush.task.task27.task2712.statistic.StatisticManager;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+public class DirectorTablet {
+
+    /**
+     * какую сумму заработали на рекламе, сгруппировать по дням;
+     */
+    public void printAdvertisementProfit(){
+
+        Map<Date, Double> mapProfit = StatisticManager.getInstance().calculateProfit();
+        double amount = 0.00;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat( "dd-MMM-yyyy", Locale.ENGLISH );
+        for (Map.Entry<Date, Double> map : mapProfit.entrySet()) {
+            System.out.println(simpleDateFormat.format(map.getKey()) + " - " + String.format(Locale.ENGLISH, "%(.2f", map.getValue()));
+            amount += map.getValue();
+        }
+        ConsoleHelper.writeMessage( "Total - " + String.format(Locale.ENGLISH, "%(.2f", amount) );
+    }
+    /**
+     * загрузка (рабочее время) повара, сгруппировать по дням
+     */
+    public void printCookWorkloading(){
+        Map<Date, TreeMap<String, Integer>> mapCookWork = StatisticManager.getInstance().calculateTimeOfWork();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat( "dd-MMM-yyyy", Locale.ENGLISH );
+        List<Date> list = new ArrayList<>( mapCookWork.keySet() );
+        Collections.sort( list );
+        Collections.reverse( list );
+        for (Date date : list) {
+            ConsoleHelper.writeMessage( simpleDateFormat.format( date ) );
+            Map<String, Integer> mapSI = mapCookWork.get( date );
+            List<String> listOfNames = new ArrayList<>( mapSI.keySet() );
+            Collections.sort( listOfNames );
+            for (String name : listOfNames) {
+                ConsoleHelper.writeMessage(name + " - " + (int) Math.ceil(mapSI.get(name)) + " min");
+            }
+            ConsoleHelper.writeMessage("");
+        }
+    }
+
+    //список активных роликов и оставшееся количество показов по каждому;
+    public void printActiveVideoSet() {
+        List<Advertisement> list = StatisticAdvertisementManager.getInstance().getListOfActiveAD();
+        Collections.sort( list, new Comparator<Advertisement>() {
+            @Override
+            public int compare(Advertisement o1, Advertisement o2) {
+                return o1.getName().compareToIgnoreCase( o2.getName() );
+            }
+        } );
+        for (Advertisement ad : list) {
+            ConsoleHelper.writeMessage( ad.getName() + " - " + ad.getHits() );
+        }
+    }
+
+    //список неактивных роликов (с оставшемся количеством показов равным нулю).
+    public void printArchivedVideoSet() {
+        List<Advertisement> list = StatisticAdvertisementManager.getInstance().getListOfPassAD();
+        Collections.sort( list, new Comparator<Advertisement>() {
+            @Override
+            public int compare(Advertisement o1, Advertisement o2) {
+                return o1.getName().compareToIgnoreCase( o2.getName() );
+            }
+        } );
+        for (Advertisement ad : list) {
+            ConsoleHelper.writeMessage( ad.getName() );
+        }
+    }
+
+}
