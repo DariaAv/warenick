@@ -1,0 +1,59 @@
+package com.javarush.task.task27.task2712.ad;
+
+/*
+Реклама - это видео определенной продолжительности. Также известно, что кто-то оплатил количество показов.
+Будем считать, что у нас известно количество оплаченных показов, общая стоимость всех показов и сам рекламный ролик.
+ */
+
+public class Advertisement {
+
+    //видео
+    private Object content;
+    private String name;
+    //начальная сумма, стоимость рекламы в копейках.
+    private long initialAmount;
+    //количество оплаченных показов
+    private int hits;
+    //продолжительность в секундах
+    private int duration;
+    //стоимости одного показа рекламного объявления в копейках (initialAmount/hits)
+    private long amountPerOneDisplaying;
+
+    public Advertisement (Object content, String name, long initialAmount, int hits, int duration) {
+        this.content = content;
+        this.name = name;
+        this.initialAmount = initialAmount;
+        this.hits = hits;
+        this.duration = duration;
+        if (hits != 0) amountPerOneDisplaying = initialAmount/hits;
+
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public int getHits() {
+        return hits;
+    }
+
+    public long getAmountPerOneDisplaying() {
+        return amountPerOneDisplaying;
+    }
+
+    /*
+    2.5. В классе Advertisement создайте метод void revalidate(). Этот метод должен:
+2.5.1. Бросать UnsupportedOperationException, если количество показов не положительное число.
+2.5.2. Уменьшать количество показов.
+     */
+    public void revalidate() throws NoVideoAvailableException {
+        if (hits <= 0) {
+            throw new UnsupportedOperationException();
+        }
+        hits--;
+    }
+}
